@@ -1,2 +1,4 @@
-﻿  zad1.c
-  Vjezbe1.vcxproj -> C:\Users\Patricia\Desktop\local repos\StrukturePodataka\Vjezbe1\Debug\Vjezbe1.exe
+﻿  zad2.c
+C:\Users\Patricia\Desktop\local repos\StrukturePodataka\Vjezbe\Vjezbe1\zad2.c(206): warning C4716: 'DeleteElement': must return a value
+C:\Users\Patricia\Desktop\local repos\StrukturePodataka\Vjezbe\Vjezbe1\zad2.c(190): warning C4716: 'DeleteAll': must return a value
+  Vjezbe1.vcxproj -> C:\Users\Patricia\Desktop\local repos\StrukturePodataka\Vjezbe\Debug\Vjezbe1.exe

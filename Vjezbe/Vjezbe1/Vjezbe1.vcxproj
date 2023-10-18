@@ -140,6 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="zad1.c" />
+    <ClCompile Include="zad2.c" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="studenti.txt" />
