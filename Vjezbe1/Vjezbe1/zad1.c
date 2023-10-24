@@ -62,7 +62,7 @@ int countRows()
 	//error handling => ako se ne moze otvoriti file
 	if (filePointer == NULL) {
 		printf("Datoteka nije pronadena.");
-		return 1;
+		return -1;
 	}
 
 
@@ -106,7 +106,7 @@ double readFile(int noRows, Student* studenti)
 	//error handling => ako se ne moze otvoriti file
 	if (filePointer == NULL) {
 		printf("Datoteka nije pronadena.");
-		return 1.0;
+		return -1.0;
 	}
 
 	for (int i = 0; i < noRows; i++) {

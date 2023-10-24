@@ -219,6 +219,7 @@ int DeleteAll(Person* element)
 
 		free(temp);
 	}
+	return 0;
 }
 
 int DeleteElement(Person* element, char Surname[])
