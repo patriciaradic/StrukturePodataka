@@ -36,6 +36,7 @@ int main()
 
 
 	noRows = countRows();
+	printf("%d", noRows);
 
 	if (noRows > 0) {
 		studenti = memoryAlloc(noRows, studenti);
@@ -54,14 +55,11 @@ int countRows()
 {
 	int count = 0;
 	char buffer[MAX_LINE] = "";
-	FILE* filePointer = NULL;
-
-
-	filePointer = fopen("studenti.txt", "r");
+	FILE* filePointer = fopen("studenti.txt", "r");
 
 	//error handling => ako se ne moze otvoriti file
 	if (filePointer == NULL) {
-		printf("Datoteka nije pronadena.");
+		perror("fopen");
 		return -1;
 	}
 

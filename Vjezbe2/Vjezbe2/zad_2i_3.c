@@ -53,6 +53,7 @@ int main()
 
 }
 
+
 int MENU(Person* Head)
 {
 	char choice;
@@ -60,8 +61,17 @@ int MENU(Person* Head)
 	Person* adress;
 
 	while (1) {
-		printf("\n\n\nChoose an option:\n");
-		printf("B Add new item to the beginning of the list \nP Print list \nE Add new item to the end of the list \nF Find elemet in list(by surname) \nD Delete element from list \nA Add after element in list\nI Add in front of element in list\nW Write list in file\nR Read list from file\nX Exit program\n");
+			
+		system("cls");
+		printf("Choose an option:\n");
+		
+		printf("R Read list from file\nB Add new item to the beginning of the list \nE Add new item to the end of the list \n");
+
+		if (Head->next) {
+			printf("I Add in front of element in list\nA Add after element in list\nF Find elemet in list(by surname) \nP Print list \nW Write list in file\nD Delete element from list \n");
+		}
+		printf("X Exit program\n");
+
 		scanf(" %c", &choice);
 
 		choice = tolower(choice);
@@ -119,9 +129,13 @@ int MENU(Person* Head)
 		else {
 			printf("You chose a non-existent option. Try again.\n");
 		}
+
+		printf("\n");
+		system("pause");
 	}
 
 }
+
 
 Person* newPerson()
 {
@@ -140,6 +154,7 @@ Person* newPerson()
 	return newPrsn;
 }
 
+
 int AddToBeginning(Person* element)
 {
 	Person* prsn = NULL;
@@ -152,6 +167,7 @@ int AddToBeginning(Person* element)
 	}
 	else return 1;
 }
+
 
 int AddToEnd(Person* element)
 {
@@ -172,6 +188,7 @@ int AddToEnd(Person* element)
 
 }
 
+
 Person* FindPerson(Person* element, char Surname[])
 {
 	while (element != NULL && strcmp(element->surname, Surname)) {
@@ -185,6 +202,7 @@ Person* FindPerson(Person* element, char Surname[])
 
 }
 
+
 Person* FindPrevPerson(Person* element, char Surname[])
 {
 	while (element->next != NULL && strcmp(element->next->surname, Surname)) {
@@ -197,6 +215,7 @@ Person* FindPrevPerson(Person* element, char Surname[])
 	return element;
 
 }
+
 
 int PrintList(Person* element)
 {
@@ -222,6 +241,7 @@ int DeleteAll(Person* element)
 	return 0;
 }
 
+
 int DeleteElement(Person* element, char Surname[])
 {
 	Person* del;
@@ -238,6 +258,7 @@ int DeleteElement(Person* element, char Surname[])
 		return 0;
 	}
 }
+
 
 int AddAfter(Person* element, char Surname[])
 {
@@ -282,15 +303,34 @@ int AddInFrontOf(Person* element, char Surname[])
 int ReadFromFile(Person* element)
 {
 	FILE* filePointer;
+	Person* prsn = NULL;
+	Person* lastElement = element;
 	char name[MAX_LEN], surname[MAX_LEN];
 	int year;
 
-	filePointer = fopen("list.txt", "r");
+	filePointer = fopen("listR.txt", "r");
+
+	if (filePointer == NULL) {
+		perror("fopen");
+		return 1;
+	}
 
 	while (!feof(filePointer)){
 
 		fscanf(filePointer, "%s %s %d", name, surname, &year);
 
+		prsn = (Person*)malloc(sizeof(Person));
+		
+		if (prsn != NULL) {
+
+			strcpy(prsn->name, name);
+			strcpy(prsn->surname, surname);
+			prsn->birthYear = year;
+
+			prsn->next = lastElement->next;
+			lastElement->next = prsn;
+		}
+		lastElement = prsn;
 	}
 
 	fclose(filePointer);
@@ -303,12 +343,11 @@ int WriteIntoFile(Person* element)
 {
 	FILE* filePointer;
 
-	filePointer = fopen("list.txt", "w");
+	filePointer = fopen("listW.txt", "w");
 
 	if (filePointer == NULL) {
-		printf("write nije dobro otvoria dat");
+		perror("fopen");
 		return 1;
-
 	}
 
 	while (element != NULL) {
