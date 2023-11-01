@@ -143,6 +143,11 @@ Person* newPerson()
 
 	newPrsn = (Person*)malloc(sizeof(Person));
 
+	if (!newPrsn) {
+		perror("malloc");
+		return NULL;
+	}
+
 	printf("Enter the new person's name: ");
 	scanf(" %s", newPrsn->name);
 	printf("Enter their surname: ");
@@ -264,9 +269,11 @@ int AddAfter(Person* element, char Surname[])
 {
 	Person* prsn = NULL;
 	
-	prsn = newPerson();
-	
 	element = FindPerson(element, Surname);
+
+	if (!element)return 1;
+
+	prsn = newPerson();
 	
 
 	if (prsn != NULL) {
@@ -284,11 +291,12 @@ int AddInFrontOf(Person* element, char Surname[])
 {
 	Person* prsn = NULL;
 
+	element = FindPrevPerson(element, Surname);
+	if (!element)return 1;
+
 	prsn = newPerson();
 
-	element = FindPrevPerson(element, Surname);
-
-
+	
 	if (prsn != NULL) {
 		prsn->next = element->next;
 		element->next = prsn;
@@ -302,11 +310,11 @@ int AddInFrontOf(Person* element, char Surname[])
 
 int ReadFromFile(Person* element)
 {
-	FILE* filePointer;
+	FILE* filePointer=NULL;
 	Person* prsn = NULL;
 	Person* lastElement = element;
-	char name[MAX_LEN], surname[MAX_LEN];
-	int year;
+	char name[MAX_LEN] ="", surname[MAX_LEN]="";
+	int year=0;
 
 	filePointer = fopen("listR.txt", "r");
 
@@ -320,8 +328,12 @@ int ReadFromFile(Person* element)
 		fscanf(filePointer, "%s %s %d", name, surname, &year);
 
 		prsn = (Person*)malloc(sizeof(Person));
-		
-		if (prsn != NULL) {
+
+		if (!prsn) {
+			perror("malloc");
+			return NULL;
+		}
+		else {
 
 			strcpy(prsn->name, name);
 			strcpy(prsn->surname, surname);
