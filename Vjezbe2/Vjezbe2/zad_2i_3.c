@@ -160,10 +160,13 @@ Person* newPerson()
 }
 
 
-int AddToBeginning(Person* element)
+int AddToBeginning(Person* headElement)
 {
 	Person* prsn = NULL;
+	Person* element = headElement;
+
 	prsn = newPerson();
+
 	if (prsn != NULL) {
 		prsn->next = element->next;
 		element->next = prsn;
@@ -174,8 +177,9 @@ int AddToBeginning(Person* element)
 }
 
 
-int AddToEnd(Person* element)
+int AddToEnd(Person* headElement)
 {
+	Person* element = headElement;
 	Person* prsn = NULL;
 	prsn = newPerson();
 
@@ -194,8 +198,10 @@ int AddToEnd(Person* element)
 }
 
 
-Person* FindPerson(Person* element, char Surname[])
+Person* FindPerson(Person* firstElement, char Surname[])
 {
+	Person* element = firstElement;
+
 	while (element != NULL && strcmp(element->surname, Surname)) {
 		element = element->next;
 	}
@@ -208,8 +214,10 @@ Person* FindPerson(Person* element, char Surname[])
 }
 
 
-Person* FindPrevPerson(Person* element, char Surname[])
+Person* FindPrevPerson(Person* headElement, char Surname[])
 {
+	Person* element = headElement;
+
 	while (element->next != NULL && strcmp(element->next->surname, Surname)) {
 		element = element->next;
 	}
@@ -222,8 +230,10 @@ Person* FindPrevPerson(Person* element, char Surname[])
 }
 
 
-int PrintList(Person* element)
+int PrintList(Person* firstElement)
 {
+	Person* element = firstElement;
+
 	while (element != NULL) {
 
 		printf("%s %s, born in %d\n", element->name, element->surname, element->birthYear);
@@ -233,9 +243,11 @@ int PrintList(Person* element)
 }
 
 
-int DeleteAll(Person* element)
+int DeleteAll(Person* headElement)
 {
 	Person* temp;
+	Person* element = headElement;
+
 	while (element->next != NULL) {
 
 		temp = element->next;
@@ -247,9 +259,10 @@ int DeleteAll(Person* element)
 }
 
 
-int DeleteElement(Person* element, char Surname[])
+int DeleteElement(Person* headElement, char Surname[])
 {
-	Person* del;
+	Person* del=NULL;
+	Person* element = headElement;
 
 	element = FindPrevPerson(element, Surname);
 	if (element == NULL) {
@@ -265,9 +278,10 @@ int DeleteElement(Person* element, char Surname[])
 }
 
 
-int AddAfter(Person* element, char Surname[])
+int AddAfter(Person* firstElement, char Surname[])
 {
 	Person* prsn = NULL;
+	Person* element = firstElement;
 	
 	element = FindPerson(element, Surname);
 
@@ -287,9 +301,10 @@ int AddAfter(Person* element, char Surname[])
 }
 
 
-int AddInFrontOf(Person* element, char Surname[])
+int AddInFrontOf(Person* headElement, char Surname[])
 {
 	Person* prsn = NULL;
+	Person* element = headElement;
 
 	element = FindPrevPerson(element, Surname);
 	if (!element)return 1;
@@ -308,10 +323,11 @@ int AddInFrontOf(Person* element, char Surname[])
 }
 
 
-int ReadFromFile(Person* element)
+int ReadFromFile(Person* headElement)
 {
 	FILE* filePointer=NULL;
 	Person* prsn = NULL;
+	Person* element = headElement;
 	Person* lastElement = element;
 	char name[MAX_LEN] ="", surname[MAX_LEN]="";
 	int year=0;
@@ -351,9 +367,10 @@ int ReadFromFile(Person* element)
 }
 
 
-int WriteIntoFile(Person* element)
+int WriteIntoFile(Person* firstElement)
 {
-	FILE* filePointer;
+	FILE* filePointer=NULL;
+	Person* element = firstElement;
 
 	filePointer = fopen("listW.txt", "w");
 
