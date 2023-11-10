@@ -22,6 +22,7 @@ int insertSorted(Polynomial* Head, Polynomial* element);
 int polyMultiply(Polynomial* firstElement1, Polynomial* firstElement2, Polynomial* headProduct);
 int polySum(Polynomial* firstElement1, Polynomial* firstElement2, Polynomial* headSum);
 int printList(char* text, Polynomial* firstElement);
+int freeElement(Polynomial* Head);
 
 
 
@@ -102,6 +103,8 @@ int parseStringIntoList(Polynomial* Head, char* buffer)
 		currentBuffer += numBytes;
 	}
 
+	freeElement(Head);
+
 	return 0;
 }
 
@@ -142,7 +145,7 @@ int insertSorted(Polynomial* Head, Polynomial* element)
 		element->Next = current->Next;
 		current->Next = element;
 	}
-	
+
 	
 	return 0;
 }
@@ -201,6 +204,8 @@ int polySum(Polynomial* firstElement1, Polynomial* firstElement2, Polynomial* he
 		insertSorted(headSum, newElement);
 		firstElement2 = firstElement2->Next;
 	}
+
+	freeElement(headSum);
 
 	return 0;
 }
@@ -262,6 +267,30 @@ int printList(char* text, Polynomial* firstElement)
 	}
 
 	printf("\n");
+
+	return 0;
+}
+
+
+int freeElement(Polynomial* Head)
+{
+	Polynomial* delete = NULL;
+	Polynomial* current = Head;
+
+	while (current->Next != NULL) {
+		
+		if (current->Next->coefficient == 0) {
+			delete = current->Next;
+			current->Next = delete->Next;
+
+			free(delete);
+		}
+		else {
+			current = current->Next;
+		}
+		
+	}
+
 
 	return 0;
 }
