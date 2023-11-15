@@ -1,0 +1,4 @@
+2023-11-05
+caj 1 3.75
+manistra 2 4
+piletina 2 11
