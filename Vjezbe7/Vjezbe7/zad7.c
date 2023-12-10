@@ -23,11 +23,12 @@ typedef struct _levelStack {
 
 
 int MENU(Directory* rootDirectory, LevelStack* headLevelStack);
+void currentPath(LevelStack* headLevelStack);
 
 Directory* createDirectory(char name[MAX_NAME_LENGTH]);
 Directory* createSubdirectory(char name[MAX_NAME_LENGTH], Directory* currentDirectory);
 Directory* changeDirectory(char name[MAX_NAME_LENGTH], Directory* currentDirectory);
-int listDirectoryContents(Directory* currentDirectory);
+void listDirectoryContents(Directory* currentDirectory);
 
 Directory* pop(LevelStack* headLevelStack);
 int push(LevelStack* headLevelStack, Directory* directoryLevel);
@@ -36,7 +37,7 @@ LevelStack* createNewLevelStackElement(Directory* directoryLevel);
 int main()
 {
     Directory headDirectory = {
-        .name = {0},
+        .name = "",
         .subDirectories = NULL,
         .next = NULL
     };
@@ -71,8 +72,11 @@ int MENU(Directory* rootDirectory, LevelStack* headLevelStack)
         printf("4 - dir (List Contents)\n");
         printf("5 - exit\n");
 
+        //currentPath
+        currentPath(headLevelStack);
+
         int choice;
-        printf("Enter your choice: ");
+        //printf("Enter your choice: ");
         scanf("%d", &choice);
 
 
@@ -92,7 +96,7 @@ int MENU(Directory* rootDirectory, LevelStack* headLevelStack)
             break;
 
         case 3:
-            if (currentDirectory != rootDirectory) {
+            if (strcmp(currentDirectory->name, rootDirectory->name)!=0) {
                 currentDirectory = pop(headLevelStack);
                 printf("Currently in '%s' \n", currentDirectory->name);
             }
@@ -119,6 +123,28 @@ int MENU(Directory* rootDirectory, LevelStack* headLevelStack)
 
 }
 
+
+void currentPath(LevelStack* headLevelStack)
+{
+    if (headLevelStack->next == NULL)
+        return;
+    
+    LevelStack* lastLevel = NULL;
+    LevelStack* firstLevel = headLevelStack->next;
+    LevelStack* currentLevel = firstLevel;
+
+    while (firstLevel->next != lastLevel) {
+        while (currentLevel->next != lastLevel) {
+            currentLevel = currentLevel->next;
+        }
+        printf("%s/", currentLevel->directoryLevel->name);
+        lastLevel = currentLevel;
+        currentLevel = firstLevel;
+    }
+    
+    printf("%s>  ", currentLevel->directoryLevel->name);
+    
+}
 
 
 Directory* createDirectory(char name[MAX_NAME_LENGTH]) {
@@ -158,17 +184,21 @@ Directory* changeDirectory(char name[MAX_NAME_LENGTH], Directory* currentDirecto
     return currentDirectory;
 }
 
-int listDirectoryContents(Directory* currentDirectory) {
+void listDirectoryContents(Directory* currentDirectory) {
     printf("Contents of directory '%s':\n", currentDirectory->name);
+    
+    if (currentDirectory->subDirectories == NULL) {
+        printf("   (empty)\n");
+        return;
+    }
+        
     Directory* subdirectory = currentDirectory->subDirectories;
     while (subdirectory != NULL) {
         printf(" - %s\n", subdirectory->name);
         subdirectory = subdirectory->next;
     }
-    if (currentDirectory->subDirectories == NULL) {
-        printf("   (empty)\n");
-    }
-    return 0;
+    
+   
 }
 
 
@@ -187,7 +217,7 @@ Directory* pop(LevelStack* headLevelStack) {
     }
 
     headLevelStack->next = toDelete->next;
-    directoryLevel = toDelete->directoryLevel;
+    directoryLevel = headLevelStack->next->directoryLevel;
     free(toDelete);
 
     return directoryLevel;
