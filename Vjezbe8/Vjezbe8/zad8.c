@@ -65,28 +65,36 @@ int  main()
 	Node headNode = { .value = 0, .LC = NULL,.RC = NULL };
 	Queue headQueue = { .levelNode = NULL,.next = NULL };
 	
+	//zad 8
 	//MENU(headNode.LC, &headQueue);
 
+	//zad 9 a
 	Node* root = NULL;
-	root = insertNode(root, 2);
-	root = insertNode(root, 5);
-	root = insertNode(root, 7);
-	root = insertNode(root, 8);
-	root = insertNode(root, 11);
-	root = insertNode(root, 1);
-	root = insertNode(root, 4);
-	root = insertNode(root, 2);
-	root = insertNode(root, 3);
-	root = insertNode(root, 7);
+	int arr[] = { 2,5,7,8,11,1,4,2,3,7 };
+	
+	for (int j = 0; j < 10; j++) {
+		root = insertNode(root, arr[j]);
+	}
 
-	inorder(root);
 	inorderInFile(root, "ogTree.txt");
-	printf("\n");
-
+	
+	//9b
 	replace(root);
 
-	inorder(root);
 	inorderInFile(root, "replacedTree.txt");
+
+	//9c
+	Node* randRoot = NULL;
+	int value = 0;
+	
+	for (int i = 0; i < 10; i++) {
+		value = 10 + rand();
+		if (value > 90) {
+			value = value % 91;
+		}
+		randRoot = insertNode(randRoot, value);
+	}
+	inorderInFile(randRoot, "randTree.txt");
 
 	return 0;
 }
