@@ -1,6 +1,20 @@
-/*Napisati program koji omoguæava rad s binarnim stablom pretraživanja. Treba
+/*8.Napisati program koji omoguæava rad s binarnim stablom pretraživanja. Treba
 omoguæiti unošenje novog elementa u stablo, ispis elemenata (inorder, preorder, postorder i
 level order), brisanje i pronalaženje nekog elementa.*/
+
+/*9. Zadan je niz brojeva 2, 5, 7, 8, 11, 1, 4, 2, 3, 7 koji su spremljeni u èvorove binarnog stabla.
+a) Napisati funkciju insert koja dodaje element u stablo tako da se pozivima te funkcije za
+sve element zadanog niza brojeva stvori stablo kao na slici Slika 1. Funkcije vraæa
+pokazivaè na korijen stabla.
+b) Napisati funkciju replace koja æe svaki element stabla zamijeniti sumom elemenata u
+njegovom lijevom i desnom podstablu (tj. sumom svih potomaka prije zamjene
+vrijednosti u tim potomcima). Npr. stablo sa slike Slika 1 transformirat æe se u stablo na
+slici Slika 2.
+c) Prepraviti program na naèin da umjesto predefiniranog cjelobrojnog polja korištenjem
+funkcije rand() generira sluèajne brojeve u rasponu <10, 90>. Takoðer, potrebno je
+upisati u datoteku sve brojeve u inorder prolasku nakon korištenja funkcije iz a), zatim b)
+dijela zadatka.
+*/
 
 #define _CRT_SECURE_NO_WARNINGS
 #include<stdio.h>
@@ -18,6 +32,7 @@ typedef struct _queue {
 	struct _queue* next;
 }Queue;
 
+//zad 8
 int MENU(Node* rootNode, Queue* headQueue);
 
 Node* createNode(int value);
@@ -37,14 +52,41 @@ Queue* createQueue(Node* node);
 void enQueue(Queue* head, Node* Child);
 Node* deQueue(Queue* head);
 
+//zad 9
+int replace(Node* rootNode);
+void inorderInFile(Node* rootNode,char* fileName);
+void inorderIntoList(Node* rootNode, Node* listHead);
+void addToEnd(Node* listHead, Node* newEl);
+void clearTree(Node* rootNode);
+
 
 int  main()
 {
 	Node headNode = { .value = 0, .LC = NULL,.RC = NULL };
 	Queue headQueue = { .levelNode = NULL,.next = NULL };
 	
-	MENU(headNode.LC, &headQueue);
+	//MENU(headNode.LC, &headQueue);
 
+	Node* root = NULL;
+	root = insertNode(root, 2);
+	root = insertNode(root, 5);
+	root = insertNode(root, 7);
+	root = insertNode(root, 8);
+	root = insertNode(root, 11);
+	root = insertNode(root, 1);
+	root = insertNode(root, 4);
+	root = insertNode(root, 2);
+	root = insertNode(root, 3);
+	root = insertNode(root, 7);
+
+	inorder(root);
+	inorderInFile(root, "ogTree.txt");
+	printf("\n");
+
+	replace(root);
+
+	inorder(root);
+	inorderInFile(root, "replacedTree.txt");
 
 	return 0;
 }
@@ -161,7 +203,7 @@ Node* insertNode(Node* rootNode, int value)
 	else if (value < rootNode->value) {
 		rootNode->LC = insertNode(rootNode->LC, value);
 	}
-	else if (value > rootNode->value) {
+	else if (value >= rootNode->value) {
 		rootNode->RC = insertNode(rootNode->RC, value);
 	}
 
@@ -379,5 +421,88 @@ Node* findMin(Node* rootNode)
 	}
 
 	return findMin(rootNode->LC);
+}
 
+int replace(Node* rootNode)
+{
+	if (rootNode == NULL)
+		return 0;
+
+	int originalValue = rootNode->value;
+
+	int LCValue = replace(rootNode->LC);
+	int RCValue = replace(rootNode->RC);
+	
+	rootNode->value = LCValue + RCValue;
+
+	return originalValue + rootNode->value;
+}
+
+
+void inorderInFile(Node* rootNode, char* fileName)
+{
+	FILE* filePointer = NULL;
+	filePointer = fopen(fileName, "w");
+
+	if (rootNode == NULL) {
+		fprintf(filePointer, "\t(empty)\n");
+		return;
+	}
+
+	Node* inorderListHead = createNode(0);
+
+	inorderIntoList(rootNode, inorderListHead);
+	Node* current = inorderListHead->RC;
+
+	while (current != NULL) {
+		fprintf(filePointer, "%d ", current->value);
+		current = current->RC;
+	}
+	
+	fclose(filePointer);
+
+	clearTree(inorderListHead);
+}
+
+
+void inorderIntoList(Node* rootNode, Node* listHead) {
+
+	if (rootNode == NULL) 
+		return;
+		
+	if (rootNode->LC != NULL) {
+		inorderIntoList(rootNode->LC, listHead);
+	}
+
+	Node* newEl = createNode(rootNode->value);
+	addToEnd(listHead, newEl);
+
+	if (rootNode->RC != NULL) {
+		inorderIntoList(rootNode->RC, listHead);
+	}
+}
+
+void addToEnd(Node* listHead, Node* newEl)
+{
+	Node* current = listHead;
+
+	while (current->RC != NULL) {
+		current = current->RC;
+	}
+
+	newEl->RC = current->RC;
+	current->RC = newEl;
+}
+
+
+void clearTree(Node* rootNode)
+{
+	if (rootNode == NULL)
+		return;
+
+	clearTree(rootNode->LC);
+
+	clearTree(rootNode->RC);
+
+	free(rootNode);
 }
