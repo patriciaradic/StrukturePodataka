@@ -13,13 +13,20 @@ Nakon formiranja podataka potrebno je ispisati države i gradove te omoguæiti kor
 tastature pretragu gradova odreðene države koji imaju broj stanovnika veæi od unosa na
 tastaturi.*/
 
+//11. Prepraviti zadatak 10 na naèin da se formira hash tablica država.Tablica ima 11 mjesta, a
+//funkcija za preslikavanje kljuè raèuna da se zbraja ASCII vrijednost prvih pet slova države zatim
+//raèuna ostatak cjelobrojnog dijeljenja te vrijednosti s velièinom tablice.Države s istim kljuèem se
+//pohranjuju u vezanu listu sortiranu po nazivu države.Svaki èvor vezane liste sadrži stablo
+//gradova sortirano po broju stanovnika, zatim po nazivu grada.
+
 #define _CRT_SECURE_NO_WARNINGS
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
 
-#define MAX_LINE 1024
-#define MAX_LEN 50
+#define MAX_LINE (1024)
+#define MAX_LEN (50)
+#define HASH_TABLE_SIZE (11)
 
 typedef struct _city {
 	char cityName[MAX_LEN];
@@ -38,9 +45,15 @@ typedef struct _country {
 	struct _country* rc;
 }Country;
 
+typedef struct _hash_table {
+	Country* buckets[HASH_TABLE_SIZE];
+}HashTable;
+
+
 City* createCity(char name[], int population);
 Country* createCountry(char name[]);
-Country* readCountriesFromFile(Country* countryHead, Country* countryRoot);
+HashTable* createHashTable();
+Country* readCountriesFromFile(Country* countryHead, Country* countryRoot, HashTable* hashTable);
 
 void countryInorder(Country* countryRoot);
 void cityListPrint(City* firstCity);
@@ -58,6 +71,12 @@ Country* insertSortCountryTree(Country* root, Country* newCountry, char fileName
 void readCitiesIntoList(char fileName[], City* head);
 void insertSortCitiesList(City* head, City* newCity);
 
+//zad 11
+int calculateHash(char countryName[]);
+void insertSortCountryHash(HashTable* hashTable, char countryName[], char fileName[]);
+Country* searchCountryInHashTable(HashTable* hashTable, char countryName[]);
+void printCountriesFromHash(HashTable* hashTable);
+
 
 int main()
 {
@@ -69,23 +88,37 @@ int main()
 							.rc = NULL 
 	};
 	Country* countryRoot = NULL;
+	HashTable* hashTable = createHashTable();
 	char enteredCountry[MAX_LEN] = "";
 	int eneteredPopulation = 0;
 
 
-	countryRoot = readCountriesFromFile(&countryHead, countryRoot);
+	countryRoot = readCountriesFromFile(&countryHead, countryRoot, hashTable);
 
 	while (1) {
 		system("cls");
-		countryInorder(countryRoot);
+		//countryInorder(countryRoot);
+		printCountriesFromHash(hashTable);
+
+		printf("\n");
 
 		printf("Unesite zemlju koju zelite pretraziti: ");
 		scanf("%s", enteredCountry);
-		printf("Unesite donju granicu stanovnistva: ");
+		
+		/*printf("Unesite donju granicu stanovnistva: ");
 		scanf("%d", &eneteredPopulation);
 
-		printCitiesWithPopul(countryHead.next, enteredCountry, eneteredPopulation);
+		printCitiesWithPopul(countryHead.next, enteredCountry, eneteredPopulation);*/
 
+		Country* foundCountry = searchCountryInHashTable(hashTable, enteredCountry);
+
+		if (foundCountry != NULL) {
+			printf("\nDrava pronadena u hash tablici: %s", foundCountry->countryName);
+		}
+		else {
+			printf("\nDrava nije pronadena u hash tablici.");
+		}
+		printf("\n");
 
 		system("pause");
 	}
@@ -125,8 +158,17 @@ Country* createCountry(char name[])
 	return newCountry;
 }
 
+HashTable* createHashTable()
+{
+	HashTable* newHashTab = (HashTable*)malloc(sizeof(HashTable));
 
-Country* readCountriesFromFile(Country* countryHead, Country* countryRoot)
+	for (int i = 0; i < HASH_TABLE_SIZE; i++) {
+		newHashTab->buckets[i] = NULL;
+	}
+	return newHashTab;
+}
+
+Country* readCountriesFromFile(Country* countryHead, Country* countryRoot, HashTable* hashTable)
 {
 	char buffer[MAX_LINE] ="";
 	char countryName[MAX_LEN] = "";
@@ -141,6 +183,7 @@ Country* readCountriesFromFile(Country* countryHead, Country* countryRoot)
 
 			insertSortCountryList(countryName, countryFile, countryHead);
 			countryRoot = insertSortCountryTree(countryRoot, createCountry(countryName), countryFile);
+			insertSortCountryHash(hashTable, countryName, countryFile);
 		}
 	}
 	
@@ -287,7 +330,6 @@ City* insertSortCitiesTree(City* root, City* newCity)
 }
 
 
-
 //b
 Country* insertSortCountryTree(Country* root, Country* newCountry, char fileName[])
 {
@@ -345,4 +387,51 @@ void insertSortCitiesList(City* head, City* newCity)
 
 	newCity->next = currentCity->next;
 	currentCity->next = newCity;
+}
+
+//11
+void insertSortCountryHash(HashTable* hashTable, char countryName[], char fileName[])
+{
+	int bucketsIndex = calculateHash(countryName);
+
+	if (hashTable->buckets[bucketsIndex] == NULL)
+		hashTable->buckets[bucketsIndex] = createCountry("");
+
+	insertSortCountryList(countryName, fileName, hashTable->buckets[bucketsIndex]);
+}
+
+int calculateHash(char countryName[])
+{
+	int sum = 0;
+
+	for (int i = 0; i < 5; i++) {
+		if (countryName[i] == '\0')
+			break;
+
+		sum += countryName[i];
+	}
+
+	return sum % HASH_TABLE_SIZE;
+}
+
+Country* searchCountryInHashTable(HashTable* hashTable, char countryName[])
+{
+	int bucketsIndex = calculateHash(countryName);
+
+	return findCountry(hashTable->buckets[bucketsIndex]->next, countryName);
+}
+
+void printCountriesFromHash(HashTable* hashTable)
+{
+	Country* currentCountry = NULL;
+
+	for (int i = 0; i < HASH_TABLE_SIZE; i++) {
+		if (hashTable->buckets[i] != NULL) {
+			currentCountry = hashTable->buckets[i]->next;
+			while (currentCountry != NULL) {
+				printf("%s\n", currentCountry->countryName);
+				currentCountry = currentCountry->next;
+			}
+		}
+	}
 }
